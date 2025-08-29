@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shop — MyShop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#ffffff; --text:#111; --muted:#666; --brand:#0f766e; --brand-2:#115e59; --soft:#f5f7f9; --border:#e5e7eb; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;background:var(--bg);color:var(--text);}
+    a{text-decoration:none;color:inherit}
+    .container{max-width:1200px;margin:0 auto;padding:0 16px}
+
+    /* Header / back link */
+    header{background:#fff;border-bottom:1px solid var(--border);padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:800;font-size:20px}
+    .back a{color:var(--brand)}
+
+    /* Search + filter */
+    .filter-bar{display:flex;flex-wrap:wrap;gap:8px;padding:16px 0}
+    .filter-bar input,.filter-bar select,.filter-bar button{
+      padding:10px;border:1px solid var(--border);border-radius:8px
+    }
+    .filter-bar button{background:var(--brand);color:#fff;cursor:pointer;border:none}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;padding:16px 0}
+    .card{border:1px solid var(--border);border-radius:12px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+    .card img{width:100%;height:180px;object-fit:cover;background:#fafafa}
+    .card .pad{padding:12px;flex:1;display:flex;flex-direction:column}
+    .name{font-weight:600;margin-bottom:4px}
+    .price{font-weight:700;margin-bottom:8px}
+    .stock{font-size:12px;color:var(--muted);margin-bottom:12px}
+    .stock .oos{color:#b91c1c;font-weight:700}
+    .actions{margin-top:auto;display:flex;gap:8px}
+    .btn{flex:1;text-align:center;padding:8px;border-radius:8px;border:1px solid var(--border);background:#fff}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn.primary:hover{background:var(--brand-2);}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="brand">🛍️ MyShop</div>
+    <div class="back"><a href="{% url 'homepage' %}">← Back to Home</a></div>
+  </div>
+</header>
+
+<div class="container">
+  <form class="filter-bar" method="get">
+    <input type="text" name="q" placeholder="Search products..." value="{{ query }}">
+    <select name="category">
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="grid">
+    {% for product in products %}
+      <div class="card">
+        {% if product.image %}
+          <img src="{{ product.image }}" alt="{{ product.name }}">
+        {% else %}
+          <img src="https://via.placeholder.com/300x200" alt="No image">
+        {% endif %}
+        <div class="pad">
+          <div class="name">{{ product.name }}</div>
+          <div class="price">৳{{ product.price }}</div>
+          <div class="stock">
+            {% if product.stock > 0 %}
+              In stock: {{ product.stock }}
+            {% else %}
+              <span class="oos">Out of Stock</span>
+            {% endif %}
+          </div>
+          <div class="actions">
+            {% if product.available and product.stock > 0 %}
+              <a class="btn primary" href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
+            {% else %}
+              <span class="btn">Unavailable</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>No products found.</p>
+    {% endfor %}
+  </div>
+
+  <div style="text-align:center;margin-top:16px">
+    <a href="{% url 'view_cart' %}" class="btn primary">🛒 View Cart</a>
+  </div>
+</div>
+
+</body>
+</html>

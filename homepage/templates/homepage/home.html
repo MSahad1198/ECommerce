@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MyShop — Fresh & Affordable</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Shop groceries, fish, meat, and veggies with fast delivery." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    :root { --bg:#ffffff; --text:#111; --muted:#666; --brand:#0f766e; --brand-2:#115e59; --soft:#f5f7f9; --card:#fff; --border:#e5e7eb; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1200px;margin:0 auto;padding:0 16px}
+
+    /* Top bar */
+    .topbar{background:#0b0f19;color:#fff}
+    .topbar .inner{display:flex;gap:16px;align-items:center;justify-content:center;padding:8px 0;font-size:14px}
+
+    /* Header */
+    header{border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:50}
+    .header-row{display:flex;align-items:center;gap:16px;padding:12px 0}
+    .brand{font-weight:800;font-size:22px;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+    .brand .logo{font-size:22px}
+    .nav{display:flex;gap:16px;margin-left:8px}
+    .nav a{padding:6px 10px;border-radius:8px}
+    .nav a.active,.nav a:hover{background:var(--soft)}
+    .search{flex:1;display:flex;gap:8px;align-items:center}
+    .search input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+    .search button{padding:10px 14px;border:none;border-radius:10px;background:var(--brand);color:#fff;cursor:pointer}
+    .user-links{display:flex;gap:10px;align-items:center}
+    .btn{padding:8px 12px;border:1px solid var(--border);border-radius:10px}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .badge{background:var(--brand);color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;margin-left:6px}
+
+    /* Hero */
+    .hero{background:linear-gradient(180deg,#e6fffb, #ffffff);padding:48px 0}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+    .hero h1{font-size:42px;line-height:1.1;margin:0 0 10px}
+    .hero p{color:var(--muted);margin:0 0 20px}
+    .cta{display:flex;gap:10px;align-items:center}
+    .cta .btn{padding:12px 16px;border-radius:12px}
+    .hero-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px}
+    .hero-img{width:100%;height:260px;border-radius:12px;object-fit:cover}
+
+    /* Categories */
+    .cats{padding:20px 0;background:var(--soft);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .cat-row{display:flex;gap:10px;flex-wrap:wrap}
+    .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:999px;font-size:14px}
+    .chip:hover{border-color:var(--brand);}
+
+    /* Product grid */
+    .section{padding:28px 0}
+    .section h2{margin:0 0 8px}
+    .sub{color:var(--muted);margin:0 0 16px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    @media(max-width:1000px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    @media(max-width:720px){ .hero-grid{grid-template-columns:1fr} .grid{grid-template-columns:repeat(2,1fr)} .nav{display:none} }
+    @media(max-width:420px){ .grid{grid-template-columns:1fr} }
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+    .card img{width:100%;height:180px;object-fit:cover;background:#fafafa}
+    .card .pad{padding:12px}
+    .name{font-weight:600;margin:4px 0}
+    .price{font-weight:700}
+    .stock{font-size:12px;color:var(--muted);margin-top:6px}
+    .stock .oos{color:#b91c1c;font-weight:700}
+    .card .actions{margin-top:auto;display:flex;gap:10px}
+    .card .actions a,.card .actions button{flex:1;text-align:center;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#fff}
+    .card .actions a.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .card .actions a.primary:hover{background:var(--brand-2);}
+
+    /* Trust + newsletter */
+    .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    @media(max-width:720px){ .trust{grid-template-columns:1fr} }
+    .trust .tile{border:1px solid var(--border);border-radius:14px;padding:16px;background:#fff}
+    .news{border:1px solid var(--border);border-radius:14px;padding:20px;background:#fff}
+    .news form{display:flex;gap:10px;flex-wrap:wrap}
+    .news input{flex:1;min-width:220px;padding:10px;border:1px solid var(--border);border-radius:10px}
+    .news button{padding:10px 14px;border:none;border-radius:10px;background:#111;color:#fff}
+
+    /* Footer */
+    footer{background:#0b0f19;color:#fff;margin-top:24px}
+    .foot{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;padding:28px 0}
+    .foot a{color:#cfe3ff}
+    .copy{border-top:1px solid #1c2333;color:#bcd; padding:12px 0;text-align:center;font-size:14px}
+    @media(max-width:720px){ .foot{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+
+  <!-- Top promo -->
+  <div class="topbar">
+    <div class="container inner">Free delivery on orders over $49 · Fresh items daily</div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-row">
+      <a class="brand" href="{% url 'homepage' %}">
+        <span class="logo">🛍️</span> MyShop
+      </a>
+
+      <!-- Main nav -->
+      <nav class="nav" aria-label="Main">
+        <a href="{% url 'homepage' %}" class="active">Home</a>
+        <a href="{% url 'product_list' %}">Shop</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </nav>
+
+      <!-- Search -->
+      <form class="search" method="get" action="{% url 'product_list' %}">
+        <input type="text" name="q" placeholder="Search fish, meat, veggies…" value="" />
+        <button type="submit">Search</button>
+      </form>
+
+      <!-- User / Cart -->
+      <div class="user-links">
+        {% if user.is_authenticated %}
+          <a class="btn" href="{% url 'profile' %}">Hi, {{ user.username }}</a>
+          <a class="btn" href="{% url 'site_logout' %}">Logout</a>
+        {% else %}
+          <a class="btn" href="{% url 'login' %}">Login</a>
+        {% endif %}
+        <a class="btn primary" href="{% url 'view_cart' %}">
+          🛒 Cart <span class="badge">{{ cart_count }}</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>Everything for your kitchen, delivered fast.</h1>
+        <p>Browse fresh fish, crisp veggies, quality meat, and daily groceries.</p>
+        <div class="cta">
+          <a href="{% url 'product_list' %}" class="btn primary">Shop Now</a>
+          <a href="#featured" class="btn">See Deals</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <img class="hero-img" src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=1200&auto=format&fit=crop" alt="Groceries">
+        <p style="margin-top:10px;color:var(--muted)">Up to 20% off selected categories this week.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="cats">
+    <div class="container">
+      <div class="cat-row" role="navigation" aria-label="Shop by category">
+        {% for cat in categories %}
+          {% if cat != 'All' %}
+          <a class="chip" href="{% url 'product_list' %}?category={{ cat }}">
+            {% if cat == 'Fish' %}🐟{% elif cat == 'Veggies' %}🥦{% elif cat == 'Meat' %}🥩{% else %}🛒{% endif %}
+            {{ cat }}
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured products -->
+  <section id="featured" class="section">
+    <div class="container">
+      <h2>Featured Products</h2>
+      <p class="sub">Popular picks in stock right now.</p>
+
+      <div class="grid">
+        {% for p in featured_products %}
+          <article class="card">
+            {% if p.image %}
+              <img src="{{ p.image }}" alt="{{ p.name }}">
+            {% else %}
+              <img src="https://via.placeholder.com/400x300" alt="No image">
+            {% endif %}
+            <div class="pad">
+              <div class="name">{{ p.name }}</div>
+              <div class="price">৳{{ p.price }}
+</div>
+              <div class="stock">
+                {% if p.stock > 0 %}In stock: {{ p.stock }}{% else %}<span class="oos">Out of Stock</span>{% endif %}
+              </div>
+              <div class="actions">
+                {% if p.available and p.stock > 0 %}
+                  <a class="primary" href="{% url 'add_to_cart' p.id %}">Add to Cart</a>
+                {% else %}
+                  <span class="btn">Unavailable</span>
+                {% endif %}
+                <a href="{% url 'product_list' %}?q={{ p.name|urlencode }}" class="btn">Details</a>
+              </div>
+            </div>
+          </article>
+        {% empty %}
+          <p>No featured products yet.</p>
+        {% endfor %}
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <a class="btn" href="{% url 'product_list' %}">Browse all products →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust signals -->
+  <section class="section">
+    <div class="container trust">
+      <div class="tile"><strong>✅ Secure checkout</strong><br><span class="sub">SSL & industry standard security.</span></div>
+      <div class="tile"><strong>🚚 Fast delivery</strong><br><span class="sub">Same day in select areas.</span></div>
+      <div class="tile"><strong>🛡️ Quality guaranteed</strong><br><span class="sub">Easy returns & refunds.</span></div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="section">
+    <div class="container news">
+      <h3>Get deals in your inbox</h3>
+      <form method="post" action="#">
+        {% csrf_token %}
+        <input type="email" name="email" placeholder="Enter your email">
+        <button type="submit">Subscribe</button>
+      </form>
+      <p class="sub" style="margin-top:8px">We’ll never spam you.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container foot">
+      <div>
+        <div class="brand"><span class="logo">🛍️</span> MyShop</div>
+        <p class="sub" style="margin-top:8px">Fresh food & essentials at great prices.</p>
+      </div>
+      <div>
+        <strong>Links</strong><br>
+        <a href="{% url 'homepage' %}">Home</a>
+        <a href="{% url 'product_list' %}">Shop</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+      <div>
+        <strong>Support</strong><br>
+        <a href="#">FAQ</a>
+        <a href="#">Shipping</a>
+        <a href="#">Returns</a>
+      </div>
+    </div>
+    <div class="copy">© {{ now|default:2025 }} MyShop. All rights reserved.</div>
+  </footer>
+</body>
+</html>

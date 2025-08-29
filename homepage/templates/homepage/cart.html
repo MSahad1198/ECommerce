@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Cart — MyShop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#ffffff; --text:#111; --muted:#666; --brand:#0f766e; --brand-2:#115e59; --soft:#f5f7f9; --border:#e5e7eb; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;background:var(--bg);color:var(--text);}
+    a{text-decoration:none;color:inherit}
+    .container{max-width:800px;margin:0 auto;padding:0 16px}
+
+    header{background:#fff;border-bottom:1px solid var(--border);padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:800;font-size:20px}
+    .back a{color:var(--brand)}
+
+    table{width:100%;border-collapse:collapse;margin-top:20px}
+    th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
+    th{background:var(--soft)}
+    .qty-controls a{padding:4px 8px;background:var(--brand);color:#fff;border-radius:6px;margin:0 2px;font-size:14px}
+    .remove{background:#b91c1c !important}
+    .total{font-weight:700;text-align:right;padding:16px 0;font-size:18px}
+    .actions{margin-top:20px;display:flex;gap:10px}
+    .btn{flex:1;text-align:center;padding:10px;border-radius:8px;border:1px solid var(--border);background:#fff}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn.primary:hover{background:var(--brand-2);}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="brand">🛍️ MyShop</div>
+    <div class="back"><a href="{% url 'product_list' %}">← Continue Shopping</a></div>
+  </div>
+</header>
+
+<div class="container">
+  <h1>Your Cart</h1>
+
+  {% if items %}
+    <table>
+      <tr>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Subtotal</th>
+        <th></th>
+      </tr>
+      {% for item in items %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td class="qty-controls">
+            <a href="{% url 'add_to_cart' item.product.id %}">+</a>
+            {{ item.quantity }}
+            <a href="{% url 'decrease_quantity' item.product.id %}">−</a>
+          </td>
+          <td>৳{{ item.product.price }}</td>
+          <td>৳{{ item.subtotal }}</td>
+          <td>
+            <a href="{% url 'remove_from_cart' item.product.id %}" class="qty-controls remove">Remove</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+
+    <div class="total">Total: ${{ total }}</div>
+
+    <div class="actions">
+      <a href="{% url 'product_list' %}" class="btn">← Continue Shopping</a>
+      <a href="#" class="btn primary">Checkout</a>
+    </div>
+  {% else %}
+    <p>Your cart is empty.</p>
+    <a href="{% url 'product_list' %}" class="btn primary">Browse Products</a>
+  {% endif %}
+</div>
+
+
+
+</body>
+</html>
