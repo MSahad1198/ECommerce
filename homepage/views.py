@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
 
 from .models import Customer, Product
 from .forms import CustomerRegisterForm, CustomerLoginForm
@@ -171,16 +170,16 @@ def login_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = authenticate(request, email=email, password=password)  # email instead of username
-            if user is not None:
-                login(request, user)
+            customer = authenticate(request, email=email, password=password)
+            if customer:
+                login(request, customer, backend='django.contrib.auth.backends.ModelBackend')
+                request.session['is_customer'] = True
                 return redirect('homepage')
             else:
-                messages.error(request, "Invalid email or password.")
+                messages.error(request, "Invalid credentials")
     else:
         form = CustomerLoginForm()
     return render(request, 'homepage/login.html', {'form': form})
-
 
 
 

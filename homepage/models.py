@@ -46,8 +46,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-
 
     # Avoid group/permission conflicts
     groups = models.ManyToManyField(
