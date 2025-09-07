@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Customer, Product
 from .forms import CustomerRegisterForm, CustomerLoginForm
+from .models import Cart, CartItem
+
 
 
 # -----------------------
@@ -19,7 +21,7 @@ def homepage(request):
     - Featured products (in stock, available, limit 8)
     - Cart count from session
     """
-    categories = ['All', 'Meat', 'Fish', 'Veggies', 'Grocery']
+    categories = ['All', 'Meat', 'Fish', 'Veggies', 'Grocery', 'Fruit']
 
     featured_products = Product.objects.filter(available=True, stock__gt=0)[:8]
 
@@ -32,7 +34,7 @@ def homepage(request):
         {
             'categories': categories,
             'featured_products': featured_products,
-            'cart_count': cart_count,
+           # 'cart_count': cart_count,
         }
     )
 
@@ -56,28 +58,29 @@ def product_list(request):
         'products': products,
         'query': query,
         'selected_category': category,
-        'categories': ['All', 'Meat', 'Fish', 'Veggies', 'Grocery'],
+        'categories': ['All', 'Meat', 'Fish', 'Veggies', 'Grocery', 'Fruit'],
     })
 
 
 # -----------------------
-# Cart functions All ()
+# Cart functions (DB for logged-in, session for guests)
 # -----------------------
 
 def add_to_cart(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        if not product.available or product.stock <= 0:
+        if not product.available:
             return redirect('product_list')
 
-        product.stock -= 1
-        if product.stock == 0:
-            product.available = False
-        product.save()
-
-        cart = request.session.get('cart', {})
-        cart[str(product_id)] = cart.get(str(product_id), 0) + 1
-        request.session['cart'] = cart
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+            item.quantity += 1
+            item.save()
+        else:
+            cart = request.session.get('cart', {})
+            cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+            request.session['cart'] = cart
 
     except Product.DoesNotExist:
         pass
@@ -85,56 +88,74 @@ def add_to_cart(request, product_id):
 
 
 def remove_from_cart(request, product_id):
-    cart = request.session.get('cart', {})
-    if str(product_id) in cart:
+    if request.user.is_authenticated:
         try:
-            product = Product.objects.get(id=product_id)
-            quantity = cart[str(product_id)]
-            product.stock += quantity
-            product.available = True
-            product.save()
-        except Product.DoesNotExist:
+            cart = Cart.objects.get(user=request.user)
+            CartItem.objects.get(cart=cart, product_id=product_id).delete()
+        except (Cart.DoesNotExist, CartItem.DoesNotExist):
             pass
-        del cart[str(product_id)]
-        request.session['cart'] = cart
+    else:
+        cart = request.session.get('cart', {})
+        if str(product_id) in cart:
+            del cart[str(product_id)]
+            request.session['cart'] = cart
     return redirect('view_cart')
 
 
 def decrease_quantity(request, product_id):
-    cart = request.session.get('cart', {})
-    if str(product_id) in cart:
+    if request.user.is_authenticated:
         try:
-            product = Product.objects.get(id=product_id)
-            product.stock += 1
-            product.available = True
-            product.save()
-        except Product.DoesNotExist:
+            cart = Cart.objects.get(user=request.user)
+            item = CartItem.objects.get(cart=cart, product_id=product_id)
+            if item.quantity > 1:
+                item.quantity -= 1
+                item.save()
+            else:
+                item.delete()
+        except (Cart.DoesNotExist, CartItem.DoesNotExist):
             pass
-
-        if cart[str(product_id)] > 1:
-            cart[str(product_id)] -= 1
-        else:
-            del cart[str(product_id)]
-        request.session['cart'] = cart
+    else:
+        cart = request.session.get('cart', {})
+        if str(product_id) in cart:
+            if cart[str(product_id)] > 1:
+                cart[str(product_id)] -= 1
+            else:
+                del cart[str(product_id)]
+            request.session['cart'] = cart
     return redirect('view_cart')
 
 
 def view_cart(request):
-    cart = request.session.get('cart', {})
     items = []
     total = 0
-    for product_id, quantity in cart.items():
-        try:
-            product = Product.objects.get(id=product_id)
-            subtotal = product.price * quantity
+
+    if request.user.is_authenticated:
+        # Logged-in users → get items from DB cart
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        for item in cart.items.select_related('product'):
+            subtotal = item.product.price * item.quantity
             items.append({
-                'product': product,
-                'quantity': quantity,
+                'product': item.product,
+                'quantity': item.quantity,
                 'subtotal': subtotal
             })
             total += subtotal
-        except Product.DoesNotExist:
-            continue
+    else:
+        # Guests → get items from session
+        cart = request.session.get('cart', {})
+        for product_id, quantity in cart.items():
+            try:
+                product = Product.objects.get(id=product_id)
+                subtotal = product.price * quantity
+                items.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'subtotal': subtotal
+                })
+                total += subtotal
+            except Product.DoesNotExist:
+                continue
+
     return render(request, 'homepage/cart.html', {'items': items, 'total': total})
 
 
@@ -142,8 +163,12 @@ def view_cart(request):
 # Context processor for cart count
 # -----------------------
 def cart_count(request):
-    cart = request.session.get('cart', {})
-    return {'cart_count': sum(cart.values())}
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        return {'cart_count': sum(item.quantity for item in cart.items.all())}
+    else:
+        cart = request.session.get('cart', {})
+        return {'cart_count': sum(cart.values())}
 
 
 # -----------------------
@@ -173,8 +198,18 @@ def login_view(request):
             password = form.cleaned_data['password']
             customer = authenticate(request, email=email, password=password)
             if customer is not None:
-                login(request, customer)#(No backended needed) backend='django.contrib.auth.backends.ModelBackend')
-                request.session['is_customer'] = True
+                login(request, customer)
+
+                # Sync session cart with DB cart
+                session_cart = request.session.get('cart', {})
+                cart, created = Cart.objects.get_or_create(user=customer)
+                for product_id, qty in session_cart.items():
+                    product = Product.objects.get(id=product_id)
+                    item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+                    item.quantity += qty
+                    item.save()
+                request.session['cart'] = {}  # clear session cart
+
                 return redirect('homepage')
             else:
                 messages.error(request, "Invalid credentials")
@@ -198,3 +233,24 @@ def site_logout(request):
 @login_required
 def profile(request):
     return render(request, 'homepage/profile.html')
+
+@login_required
+def checkout(request):
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    for item in cart.items.select_related('product'):
+        product = item.product
+        if product.stock >= item.quantity:
+            product.stock -= item.quantity
+            if product.stock == 0:
+                product.available = False
+            product.save()
+        else:
+            # Handle case where stock is not enough
+            messages.error(request, f"Not enough stock for {product.name}")
+            return redirect('view_cart')
+
+    # Clear cart after successful order
+    cart.items.all().delete()
+    messages.success(request, "Order placed successfully!")
+    return redirect('homepage')
+
