@@ -10,7 +10,7 @@ from .forms import CustomerRegisterForm, CustomerLoginForm
 
 
 # -----------------------
-# Homepage view
+# Homepage view 
 # -----------------------
 def homepage(request):
     """
@@ -61,8 +61,9 @@ def product_list(request):
 
 
 # -----------------------
-# Cart functions
+# Cart functions All ()
 # -----------------------
+
 def add_to_cart(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
@@ -171,8 +172,8 @@ def login_view(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             customer = authenticate(request, email=email, password=password)
-            if customer:
-                login(request, customer, backend='django.contrib.auth.backends.ModelBackend')
+            if customer is not None:
+                login(request, customer)#(No backended needed) backend='django.contrib.auth.backends.ModelBackend')
                 request.session['is_customer'] = True
                 return redirect('homepage')
             else:

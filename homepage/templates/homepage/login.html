@@ -1,7 +1,20 @@
-<h2>Login</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
-<p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+{% extends "homepage/base.html" %}
+
+{% block title %}Login ? MyShop{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="card">
+    <h2>Login</h2>
+    <!-- Login Form -->
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Login</button>
+    </form>
+    <p class="auth-note">
+      Don't have an account? <a href="{% url 'register' %}">Register here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

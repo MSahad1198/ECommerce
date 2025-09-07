@@ -90,12 +90,12 @@
 </head>
 <body>
 
-  <!-- Top promo -->
+  <!--|| Top promo ||-->
   <div class="topbar">
-    <div class="container inner">Free delivery on orders over $49 · Fresh items daily</div>
+    <div class="container inner">Free delivery on orders over 4700taka · Fresh items daily</div>
   </div>
 
-  <!-- Header -->
+<!--|| Header ||-->
   <header>
     <div class="container header-row">
       <a class="brand" href="{% url 'homepage' %}">
@@ -116,7 +116,7 @@
         <button type="submit">Search</button>
       </form>
 
-      <!-- User / Cart -->
+      <!--|| User / Cart ||-->
       <div class="user-links">
         {% if user.is_authenticated %}
           <a class="btn" href="{% url 'profile' %}">Hi, {{ user.username }}</a>
@@ -250,7 +250,7 @@
         <a href="#">Returns</a>
       </div>
     </div>
-    <div class="copy">© {{ now|default:2025 }} MyShop. All rights reserved.</div>
+    <div class="copy">© {{ now|default:2025 }} MyShop. Developed By Team Alpha.</div>
   </footer>
 </body>
 </html>

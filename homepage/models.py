@@ -1,6 +1,7 @@
 # homepage/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
 
 # ------------------------------
 # Product model
@@ -11,6 +12,7 @@ class Product(models.Model):
         ('Fish', 'Fish'),
         ('Veggies', 'Veggies'),
         ('Grocery', 'Grocery'),
+        ('Fruit', 'Fruit')
     ]
 
     name = models.CharField(max_length=100)
@@ -70,3 +72,5 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+           
+

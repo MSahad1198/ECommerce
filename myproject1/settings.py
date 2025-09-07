@@ -25,13 +25,13 @@ SECRET_KEY = 'django-insecure-&pgf4!!(z8*pa%$)c)o*uu6xkz!(f0c4^=9dh)s3f@q8$-545o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    #'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -131,3 +131,4 @@ LOGOUT_REDIRECT_URL = 'homepage'  # name of your homepage URL pattern
 # Optional: avoid Django's default /accounts/logout/
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'homepage'
+AUTH_USER_MODEL = 'homepage.Customer'

@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}MyShop{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* === Global Styles === */
+    body {margin:0; font-family:system-ui, sans-serif; background:#f5f7f9; color:#111;}
+    a {text-decoration:none; color:inherit;}
+    .container {max-width:1200px; margin:0 auto; padding:0 16px;}
+
+    /* Header */
+    header{border-bottom:1px solid #e5e7eb; background:#fff; position:sticky; top:0; z-index:50;}
+    .header-row{display:flex; align-items:center; gap:16px; padding:12px 0;}
+    .brand{font-weight:800; font-size:22px; display:flex; align-items:center; gap:8px;}
+    .nav{display:flex; gap:16px; margin-left:8px;}
+    .nav a{padding:6px 10px; border-radius:8px;}
+    .nav a.active, .nav a:hover{background:#f5f7f9;}
+    .user-links{display:flex; gap:10px; align-items:center;}
+    .btn{padding:8px 12px; border:1px solid #ddd; border-radius:10px;}
+    .btn.primary{background:#0f766e; border-color:#0f766e; color:#fff;}
+    .btn.primary:hover{background:#115e59;}
+    .badge{background:#0f766e; color:#fff; border-radius:999px; padding:2px 8px; font-size:12px;}
+
+    /* Footer */
+    footer{background:#0b0f19; color:#fff; margin-top:24px;}
+    .foot{display:grid; grid-template-columns:2fr 1fr 1fr; gap:16px; padding:28px 0;}
+    .foot a{color:#cfe3ff;}
+    .copy{border-top:1px solid #1c2333; color:#bcd; padding:12px 0; text-align:center; font-size:14px;}
+
+    /* Auth card (login/register) */
+    .auth-wrapper{display:flex; align-items:center; justify-content:center; min-height:80vh;}
+    .card{background:#fff; padding:30px; border-radius:14px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:100%; max-width:400px;}
+    .card h2{text-align:center; margin-bottom:20px; color:#0f766e;}
+    form{display:flex; flex-direction:column; gap:12px;}
+    input, button{padding:12px; border-radius:8px; border:1px solid #ddd; font-size:15px;}
+    button{background:#0f766e; color:#fff; border:none; cursor:pointer;}
+    button:hover{background:#115e59;}
+    .auth-note{text-align:center; margin-top:12px; font-size:14px;}
+    .auth-note a{color:#0f766e;}
+  </style>
+</head>
+<body>
+
+  <!-- === Header with Navbar === -->
+  <header>
+    <div class="container header-row">
+      <a class="brand" href="{% url 'homepage' %}">🛍 MyShop</a>
+      <nav class="nav">
+        <a href="{% url 'homepage' %}" {% if request.resolver_match.url_name == 'homepage' %}class="active"{% endif %}>Home</a>
+        <a href="{% url 'product_list' %}" {% if request.resolver_match.url_name == 'product_list' %}class="active"{% endif %}>Shop</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </nav>
+      <div class="user-links">
+        {% if user.is_authenticated %}
+          <a class="btn" href="{% url 'profile' %}">Hi, {{ user.username }}</a>
+          <a class="btn" href="{% url 'site_logout' %}">Logout</a>
+        {% else %}
+          <a class="btn" href="{% url 'login' %}">Login</a>
+        {% endif %}
+        <a class="btn primary" href="{% url 'view_cart' %}">🛒 Cart <span class="badge">{{ cart_count }}</span></a>
+      </div>
+    </div>
+  </header>
+{% if messages %}
+  <div class="container" style="margin:20px auto; max-width:600px;">
+    {% for message in messages %}
+      <div style="
+        padding:12px;
+        border-radius:8px;
+        margin-bottom:10px;
+        {% if message.tags == 'error' %}
+          background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;
+        {% elif message.tags == 'success' %}
+          background:#dcfce7; color:#166534; border:1px solid #86efac;
+        {% else %}
+          background:#f3f4f6; color:#111; border:1px solid #e5e7eb;
+        {% endif %}
+      ">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+  <!-- === Page content === -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- === Footer === -->
+  <footer>
+    <div class="container foot">
+      <div>
+        <div class="brand">🛍 MyShop</div>
+        <p class="sub">Fresh food & essentials at great prices.</p>
+      </div>
+      <div>
+        <strong>Links</strong><br>
+        <a href="{% url 'homepage' %}">Home</a><br>
+        <a href="{% url 'product_list' %}">Shop</a><br>
+        <a href="#">About</a><br>
+        <a href="#">Contact</a>
+      </div>
+      <div>
+        <strong>Support</strong><br>
+        <a href="#">FAQ</a><br>
+        <a href="#">Shipping</a><br>
+        <a href="#">Returns</a>
+      </div>
+    </div>
+    <div class="copy">© {{ now|default:2025 }} MyShop. Developed By Team Alpha.</div>
+  </footer>
+</body>
+</html>
