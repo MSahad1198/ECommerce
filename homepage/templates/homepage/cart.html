@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Your Cart — MyShop</title>
+  <title>Your Cart — C.NovaShop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root { --bg:#ffffff; --text:#111; --muted:#666; --brand:#0f766e; --brand-2:#115e59; --soft:#f5f7f9; --border:#e5e7eb; }
@@ -30,8 +30,11 @@
 <body>
 
 <header>
-  <div class="container">
-    <div class="brand">🛍️ MyShop</div>
+  <div class="container" style="display:flex; align-items:left; justify-content:space-between;">
+    <div class="brand">
+      <a class="brand" href="{% url 'homepage' %}">
+        <span class="logo">🛍️</span> C.NovaShop
+      </a></div>
     <div class="back"><a href="{% url 'product_list' %}">← Continue Shopping</a></div>
   </div>
 </header>

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}MyShop{% endblock %}</title>
+  <title>{% block title %}C.NovaShop{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     /* === Global Styles === */
@@ -47,7 +47,7 @@
   <!-- === Header with Navbar === -->
   <header>
     <div class="container header-row">
-      <a class="brand" href="{% url 'homepage' %}">🛍 MyShop</a>
+      <a class="brand" href="{% url 'homepage' %}">🛍 C.NovaShop</a>
       <nav class="nav">
         <a href="{% url 'homepage' %}" {% if request.resolver_match.url_name == 'homepage' %}class="active"{% endif %}>Home</a>
         <a href="{% url 'product_list' %}" {% if request.resolver_match.url_name == 'product_list' %}class="active"{% endif %}>Shop</a>
@@ -94,7 +94,7 @@
   <footer>
     <div class="container foot">
       <div>
-        <div class="brand">🛍 MyShop</div>
+        <div class="brand">🛍 C.NovaShop</div>
         <p class="sub">Fresh food & essentials at great prices.</p>
       </div>
       <div>
@@ -111,7 +111,7 @@
         <a href="#">Returns</a>
       </div>
     </div>
-    <div class="copy">© {{ now|default:2025 }} MyShop. Developed By Team Alpha.</div>
+    <div class="copy">© {{ now|default:2025 }} C.NovaShop. Developed By Team Codex Nova.</div>
   </footer>
 </body>
 </html>

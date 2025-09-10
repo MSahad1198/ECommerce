@@ -1,0 +1,38 @@
+{% extends "homepage/base.html" %}
+
+{% block title %}Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:800px; margin:20px auto;">
+  <h2>Order #{{ order.id }}</h2>
+  <p><strong>Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+  <p><strong>Total:</strong> ৳{{ order.total_price }}</p>
+
+  <h3>Items</h3>
+  <table style="width:100%; border-collapse:collapse;">
+    <tr>
+      <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Product</th>
+      <th style="border-bottom:1px solid #ddd; padding:8px;">Qty</th>
+      <th style="border-bottom:1px solid #ddd; padding:8px;">Price</th>
+      <th style="border-bottom:1px solid #ddd; padding:8px;">Subtotal</th>
+    </tr>
+    {% for item in order.items.all %}
+    <tr>
+      <td style="padding:8px;">{{ item.product.name }}</td>
+      <td style="padding:8px; text-align:center;">{{ item.quantity }}</td>
+      <td style="padding:8px;">৳{{ item.price }}</td>
+      <td style="padding:8px;">৳{{ item.subtotal }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+<p style="display: flex; justify-content: space-between; align-items: center; margin-top:20px;">
+  <a href="{% url 'order_history' %}" style="color:#0f766e;">← Back to order history</a>
+  <button onclick="window.print()" 
+        style="padding:10px 14px; background:#0f766e; color:white; border:none; border-radius:6px; cursor:pointer;">
+    🖨 Print Order
+  </button>
+</p>
+
+</div>
+{% endblock %}

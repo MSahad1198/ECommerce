@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from .models import Customer, Product
 from .forms import CustomerRegisterForm, CustomerLoginForm
 from .models import Cart, CartItem
+from .models import Order, OrderItem
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
 
 
@@ -237,6 +240,17 @@ def profile(request):
 @login_required
 def checkout(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
+    if not cart.items.exists():
+        messages.error(request, "Your cart is empty.")
+        return redirect('view_cart')
+
+    # ✅ Create the order first
+    order = Order.objects.create(
+        user=request.user,
+        total_price=0
+    )
+
+    total = 0
     for item in cart.items.select_related('product'):
         product = item.product
         if product.stock >= item.quantity:
@@ -244,13 +258,42 @@ def checkout(request):
             if product.stock == 0:
                 product.available = False
             product.save()
+
+            # ✅ Add each product as OrderItem
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                price=product.price,
+                quantity=item.quantity
+            )
+
+            total += product.price * item.quantity
         else:
-            # Handle case where stock is not enough
             messages.error(request, f"Not enough stock for {product.name}")
             return redirect('view_cart')
 
-    # Clear cart after successful order
+    # ✅ Update total after loop
+    order.total_price = total
+    order.save()
+
+    # ✅ Empty the cart
     cart.items.all().delete()
-    messages.success(request, "Order placed successfully!")
+
+    messages.success(request, f"Order #{order.id} placed successfully!")
     return redirect('homepage')
 
+# -----------------------
+# Purchase history 
+# -----------------------
+@login_required
+def order_history(request):
+    """Show all past orders for the logged-in user"""
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'homepage/order_history.html', {'orders': orders})
+
+
+@login_required
+def order_detail(request, order_id):
+    """Show details of one specific order"""
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'homepage/order_detail.html', {'order': order})
